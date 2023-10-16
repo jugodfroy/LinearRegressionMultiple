@@ -29,6 +29,30 @@ def prepare_vectors(x, y):
     y = y.reshape(y.shape[0],1)
     return X, y
 
+
+def find_combination(X, y, test_size_list, iteration_list, rate_list ):
+    """Returns a dataframe with the metrics for each combination of test_size, iteration and rate."""
+    model_dict = {}
+    model_df = pd.DataFrame(columns=['test_size', 'iteration', 'rate', 'r_square', 'mse'])  #create empty dataframe
+
+    #for each combination of test_size, iteration and rate, compute the model and add it to the model_dict
+    for test_size in test_size_list:
+        for iteration in iteration_list:
+            for rate in rate_list:
+                model = Model(X, y, rate, iteration, test_size)
+                model.compute_regression()
+                model_dict[(test_size, iteration, rate)] = model
+            
+    #sort model_dict by r_square, if r_square is the same, sort by iteration Descending
+    model_dict = sorted(model_dict.items(), key=lambda x: x[1].get_r_square(), reverse=True)
+    
+    #convert dict to dataframe
+    for i in range(len(model_dict)):
+        model_df.loc[i] = [model_dict[i][0][0], model_dict[i][0][1], model_dict[i][0][2], model_dict[i][1].get_r_square(), model_dict[i][1].mse]
+
+    return model_df, model_dict  
+
+
 def sk_compute_plot(X, y, degree, xlabel, ylabel, title):
     """Compute the polynomial regression using sci kit learn and plot the graph"""
     sk_poly = PolynomialFeatures(degree)
@@ -46,15 +70,11 @@ def sk_compute_plot(X, y, degree, xlabel, ylabel, title):
     #plot the graph 
     plt.scatter(X, y, color='blue', label='data')
     plt.plot(x, sk_model.predict(x_poly), color='red', label='sklearn-based model')
-    
     plt.title(title + '   r2 :' + str(r_squared_sklearn))
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
-
     plt.legend()
-
     plt.show()
-
 
 
 if __name__ == '__main__':
