@@ -1,8 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns                                     #not used (instructions commented)
-from sklearn.metrics import r2_score, mean_squared_error  #not used (instructions commented)
-from sklearn.model_selection import train_test_split      #not used (instructions commented)
+from sklearn.metrics import r2_score, mean_squared_error  
+from sklearn.model_selection import train_test_split      
+from sklearn.linear_model import LinearRegression
 
 class Model:
     """ A model is defined with its dataset, learning rate, number of iterations and test size. """
@@ -20,7 +21,8 @@ class Model:
         self.learning_rate = learning_rate
         self.iterations = iterations
         self.test_size = test_size  #proportion of the test set
-        self.theta = np.random.randn((X.shape[1]+1),1)  #set theta to random values
+        #initialise theta to 0
+        self.theta = np.zeros((self.X.shape[1],1))              #np.random.randn((X.shape[1]+1),1)  to set theta to random values
         self.learning_cost = []     #list that will contain the cost for each iteration of the gradient descent
         self.r_square = 0           #coefficient r^2
         self.mse = 0                #mean square error
@@ -96,6 +98,17 @@ class Model:
         mse = np.sum((self.y_test - predictions)**2) / len(self.y_test)
         r_square = 1 - np.sum((self.y_test - predictions)**2) / np.sum((self.y_test - np.mean(self.y_test))**2)
         return mse, r_square, predictions
+    
+    def sklearn_regression(self):
+        reg = LinearRegression().fit(self.X_train, self.y_train) #fit the model
+        predictions = reg.predict(self.X_test) #predict
+        #theta
+        theta = reg.coef_
+        #The mean squared error
+        mse = mean_squared_error(self.y_test, predictions)
+        #r2
+        r2 = r2_score(self.y_test, predictions)
+        return theta, mse, r2
     
     def transform(self, degree):
         """Transform the input data into polynomial features"""
