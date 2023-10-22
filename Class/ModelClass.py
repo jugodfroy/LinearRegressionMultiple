@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns                                     #not used (instructions commented)
 from sklearn.metrics import r2_score, mean_squared_error  
-from sklearn.model_selection import train_test_split      
+from sklearn.model_selection import train_test_split       #not used (instructions commented)
 from sklearn.linear_model import LinearRegression
 
 class Model:
